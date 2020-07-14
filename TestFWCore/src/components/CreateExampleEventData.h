@@ -8,6 +8,7 @@
 // edm4hep
 #include "FWCore/DataHandle.h"
 #include "TTree.h"
+#include "TFile.h"
 
 
 
@@ -53,5 +54,10 @@ private:
   DataHandle<float> m_singleFloatHandle{"SingleFloat", Gaudi::DataHandle::Writer, this};
   DataHandle<std::vector<float>> m_vectorFloatHandle{"VectorFloat", Gaudi::DataHandle::Writer, this};
   DataHandle<int> m_singleIntHandle{"SingleInt", Gaudi::DataHandle::Writer, this};
+
+  /// for testing: write a second TFile by user in an algorithm
+  Float_t m_value;
+  TFile* m_file;
+  TTree* m_tree;
 };
 #endif /* TESTFWCORE_CREATEEXAMPLEEVENTDATA */

@@ -19,6 +19,15 @@ StatusCode CreateExampleEventData::initialize() {
   if (GaudiAlgorithm::initialize().isFailure()) {
     return StatusCode::FAILURE;
   }
+
+  /// for testing
+  m_value = 0.1;
+  m_file = TFile::Open("tmp.root", "RECREATE");
+  m_tree = new TTree("mytree", "testing");
+
+  m_tree->SetDirectory(m_file); //doesn't work
+  m_tree->Branch("value", &m_value, "value/F");
+
   return StatusCode::SUCCESS;
 }
 
@@ -44,8 +53,29 @@ StatusCode CreateExampleEventData::execute() {
   auto hit = hits->create();
   hit.setPosition({3, 4, 5});
 
+  /// for testing
+  m_value += 1.1;
+  m_tree->Fill();
 
   return StatusCode::SUCCESS;
 }
 
-StatusCode CreateExampleEventData::finalize() { return GaudiAlgorithm::finalize(); }
+StatusCode CreateExampleEventData::finalize() {
+  /// for testing
+  if ( true ) {
+      /// m_tree will be wrote to the podio output file, but not m_file
+      m_tree->Write();
+      m_file->Close();
+  }
+  else {
+      /// this is OK when there is not too many entries, and no auto-flush has been invoked
+      /// otherwise there will be a crash
+      const char* preDir = gDirectory->GetPath();
+      m_file->cd();
+      m_tree->Write();
+      m_file->Close();
+      gDirectory->cd(preDir);
+  }
+
+  return GaudiAlgorithm::finalize();
+}
